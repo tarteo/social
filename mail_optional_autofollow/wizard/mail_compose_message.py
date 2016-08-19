@@ -27,4 +27,4 @@ class MailComposeMessage(models.TransientModel):
             super(MailComposeMessage, wizard.with_context(
                 mail_post_autofollow=wizard.autofollow_recipients)).send_mail(
                     auto_commit=auto_commit)
-        return {'type': 'ir.actions.act_window_close'}
+        return True
