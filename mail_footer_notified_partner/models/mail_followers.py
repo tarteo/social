@@ -42,10 +42,13 @@ class MailNotification(models.Model):
 
     @api.model
     def get_additional_footer_with_recipient(self, recipients_ids):
-        recipients = self.env['res.partner'].browse(recipients_ids)
-        recipients_name = [recipient.name for recipient in recipients]
-        additional_footer = "<br /><b>%s%s.</b><br />" % (
-            _("Also notified: "),
-            ", ".join(recipients_name),
-        )
+        if len(recipients_ids) > 1:
+            recipients = self.env['res.partner'].browse(recipients_ids)
+            recipients_name = [recipient.name for recipient in recipients]
+            additional_footer = "<br /><b>%s%s.</b><br />" % (
+                _("Also notified: "),
+                ", ".join(recipients_name),
+            )
+        else:
+            additional_footer = ""
         return additional_footer
