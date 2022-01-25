@@ -32,18 +32,22 @@ class MailTemplate(models.Model):
         # Generate attachments (inspired from Odoo); Just add new attachments
         # into 'attachments' key
         for res_id, values in results.items():
+            record = self.env[self.model].browse(res_id)
             attachments = values.setdefault("attachments", [])
             for template_report in self.template_report_ids:
+                active_res_id = template_report.get_active_res_id(record)
+                if not active_res_id:
+                    continue
                 report_name = self._render_template(
-                    template_report.report_name, template_report.model, res_id
+                    template_report.report_name, template_report.model, active_res_id
                 )
                 report = template_report.report_template_id
                 report_service = report.report_name
 
                 if report.report_type in ["qweb-html", "qweb-pdf"]:
-                    result, report_format = report.render_qweb_pdf([res_id])
+                    result, report_format = report.render_qweb_pdf([active_res_id])
                 else:
-                    res = report.render([res_id])
+                    res = report.render([active_res_id])
                     if not res:
                         raise exceptions.UserError(
                             _("Unsupported report type %s found.") % report.report_type
